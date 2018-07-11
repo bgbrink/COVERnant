@@ -11,7 +11,7 @@ def extract(args):
     coverage_extractor = CoverageExtractor(
         args.coordinate_file, args.coverage_file, args.output_prefix,
         args.flip_reverse_strand, args.matrix_alignment, args.window_size,
-        args.step_size)
+        args.step_size, args.meta_plots)
     log("Reading wiggle file")
     coverage_extractor.read_wiggle_file()
     log("Reading coordinate files")
@@ -34,7 +34,7 @@ class CoverageExtractor(object):
     """ """
     def __init__(self, coordinate_file, coverage_file, output_prefix,
                  flip_reverse_strand, matrix_alignment, window_size,
-                 step_size):
+                 step_size, meta_plots):
         self._coordinate_file = coordinate_file
         self._coverage_file = coverage_file
         self._output_prefix = output_prefix
@@ -45,6 +45,7 @@ class CoverageExtractor(object):
         self._coverage_lists = []
         self._window_size = window_size
         self._step_size = step_size
+        self._meta_plots = meta_plots
 
     def read_wiggle_file(self):
         wiggle_parser = WiggleParser()
@@ -79,11 +80,23 @@ class CoverageExtractor(object):
     def generate_coverage_matrix(self):
         max_range = max(
             [len(coverages) for coverages in self._coverage_lists])
+        if self._meta_plots:
+            max_range = 100
         self._coverage_df = self._init_coverage_dataframe(max_range)
         for coordinate, coverages in zip(
                 self._coordinates, self._coverage_lists):
             aligned_coverages = self._align_coverages(coverages, max_range)
-            if self._window_size == 1 and self._step_size == 1:
+            if self._meta_plots:
+                row = [coordinate[key] for key in
+                       ["replicon", "start", "end", "strand"]]
+                length = coordinate.get("end")-coordinate.get("start")
+                step = length/100
+                for pos in np.arange(1,length,step):
+                    start = int(pos)
+                    end = int(pos+step-1)
+                    coverages = aligned_coverages[start:end]
+                    row.append(np.mean(coverages))
+            elif self._window_size == 1 and self._step_size == 1:
                 row = [coordinate[key] for key in
                        ["replicon", "start", "end",
                         "strand"]] + aligned_coverages
