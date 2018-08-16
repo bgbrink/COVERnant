@@ -90,6 +90,8 @@ class CoverageExtractor(object):
                 row = [coordinate[key] for key in
                        ["replicon", "start", "end", "strand"]]
                 length = coordinate.get("end")-coordinate.get("start")
+                if length < 100:
+                    continue
                 step = length/100
                 for pos in np.arange(1,length,step):
                     start = int(pos)
