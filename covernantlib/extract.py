@@ -90,7 +90,7 @@ class CoverageExtractor(object):
                 row = [coordinate[key] for key in
                        ["replicon", "start", "end", "strand"]]
                 length = coordinate.get("end")-coordinate.get("start")
-                if length < 100:
+                if length <= 100:
                     continue
                 step = length/100
                 for pos in np.arange(1,length,step):
@@ -112,6 +112,8 @@ class CoverageExtractor(object):
                     end = pos+int(self._window_size/2)
                     coverages = aligned_coverages[start:end]
                     row.append(np.mean(coverages))
+            if len(row) != 104:
+                print("here")
             row_df = self._init_coverage_dataframe(max_range, [row])
             self._coverage_df = self._coverage_df.append(
                 row_df, ignore_index=True)
