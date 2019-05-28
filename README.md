@@ -80,6 +80,7 @@ usage: covernant extract [-h] [--output_prefix OUTPUT_PREFIX]
                          [--flip_reverse_strand]
                          [--matrix_alignment {left,center,right}]
                          [--window_size WINDOW_SIZE] [--step_size STEP_SIZE]
+                         [--meta_plots]
                          coverage_file coordinate_file
 
 positional arguments:
@@ -100,6 +101,9 @@ optional arguments:
   --step_size STEP_SIZE
                         Step size for sliding window average calculation.
                         Default is 1.
+  --meta_plots          Calculate the coverage as a fraction relative to the
+                        length of the feature to create meta plots
+
 ```
 
 ## Subcommand `plot_matrix`
